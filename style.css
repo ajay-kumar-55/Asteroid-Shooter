@@ -1,0 +1,1441 @@
+/* ========== GLOBAL STYLES ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  image-rendering: pixelated; /* Makes everything look crisp and pixelated */
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* Disable long press on mobile */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+  position: fixed;
+  font-family: "Courier New", monospace;
+}
+
+/* ========== MAIN GAME CONTAINER ========== */
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a1a; /* Dark blue background */
+  overflow: hidden;
+  touch-action: none; /* Prevent scrolling on touch */
+}
+
+/* ========== CRT SCREEN EFFECTS ========== */
+/* CRT Scanlines - horizontal lines across screen */
+#game::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* CRT screen flicker animation */
+#game::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+  z-index: 99;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.08;
+  }
+  100% {
+    opacity: 0.05;
+  }
+}
+
+/* ========== BACKGROUND STARS ========== */
+.star {
+  position: absolute;
+  background: white;
+  /* box-shadow: 0 0 4px rgba(255, 255, 255, 0.8); */
+  /* image-rendering: pixelated; */
+}
+
+/* ========== PLAYER SPACESHIP ========== */
+/* Detailed spaceship with body, wings, and cockpit */
+#player {
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  z-index: 5;
+}
+
+/* Main ship body */
+#player::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 35px solid #00ffff;
+  filter: drop-shadow(0 0 10px #00ffff);
+}
+
+/* Cockpit window */
+#player::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 12px;
+  background: #0088ff;
+  border-radius: 50% 50% 30% 30%;
+  box-shadow: 0 0 8px #0088ff, inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Left wing */
+.wing-left {
+  position: absolute;
+  left: -8px;
+  top: 20px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-right: 20px solid #00cccc;
+  filter: drop-shadow(0 0 8px #00cccc);
+}
+
+/* Right wing */
+.wing-right {
+  position: absolute;
+  right: -8px;
+  top: 20px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 20px solid #00cccc;
+  filter: drop-shadow(0 0 8px #00cccc);
+}
+
+/* Engine glow effect */
+.engine-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 8px;
+  background: radial-gradient(ellipse at center, #00ffff 0%, transparent 70%);
+  border-radius: 50%;
+  animation: enginePulse 0.3s infinite alternate;
+}
+
+@keyframes enginePulse {
+  from {
+    opacity: 0.6;
+    transform: translateX(-50%) scaleY(1);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1.3);
+  }
+}
+
+/* ========== ASTEROID OBSTACLES ========== */
+.obstacle {
+  position: absolute;
+  background: #808080; /* Brown color */
+  border-radius: 40% 50% 45% 55%; /* Irregular shape */
+  /* box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+    inset 5px 5px 10px rgba(0, 0, 0, 0.5); */
+}
+
+/* Dark crater on asteroid */
+.obstacle::before {
+  content: "";
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 20%;
+  height: 20%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+}
+
+/* Another crater on asteroid */
+.obstacle::after {
+  content: "";
+  position: absolute;
+  bottom: 20%;
+  right: 20%;
+  width: 15%;
+  height: 15%;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+}
+
+/* ========== LASER BEAM ========== */
+/* Pixelated laser shot from player */
+.laser {
+  position: absolute;
+  width: 8px;
+  height: 16px;
+  background: #ff0066; /* Pink base */
+  /* image-rendering: pixelated; */
+  box-shadow: 0 -4px 0 0 #ff3388, /* Lighter pink blocks */ 0 -8px 0 0 #ff66aa,
+    0 -12px 0 0 #ff99cc, 0 0 8px #ff0066,
+    /* Glow effect */ 0 0 16px rgba(255, 0, 102, 0.8);
+  z-index: 3;
+}
+
+/* ========== EXPLOSION EFFECT ========== */
+/* Pixelated explosion animation */
+.explosion {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #ffff00; /* Yellow center */
+  image-rendering: pixelated;
+  animation: pixelExplode 0.4s steps(4) forwards;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 8px 0 0 0 #ff8800, /* Orange blocks */ -8px 0 0 0 #ff8800,
+    0 8px 0 0 #ff8800, 0 -8px 0 0 #ff8800, 8px 8px 0 0 #ff4400,
+    /* Red blocks */ -8px -8px 0 0 #ff4400, 8px -8px 0 0 #ff4400,
+    -8px 8px 0 0 #ff4400;
+}
+
+/* Explosion animation - grows and fades */
+@keyframes pixelExplode {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+    box-shadow: 8px 0 0 0 #ff8800, -8px 0 0 0 #ff8800, 0 8px 0 0 #ff8800,
+      0 -8px 0 0 #ff8800;
+  }
+  25% {
+    transform: scale(1);
+    box-shadow: 12px 0 0 0 #ff8800, -12px 0 0 0 #ff8800, 0 12px 0 0 #ff8800,
+      0 -12px 0 0 #ff8800, 12px 12px 0 0 #ff4400, -12px -12px 0 0 #ff4400;
+  }
+  50% {
+    transform: scale(1.5);
+    box-shadow: 16px 0 0 0 #ff6600, -16px 0 0 0 #ff6600, 0 16px 0 0 #ff6600,
+      0 -16px 0 0 #ff6600, 16px 16px 0 0 #ff2200, -16px -16px 0 0 #ff2200,
+      16px -16px 0 0 #ff2200, -16px 16px 0 0 #ff2200;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+    box-shadow: 20px 0 0 0 transparent, -20px 0 0 0 transparent;
+  }
+}
+
+/* ========== SCREEN SHAKE EFFECT ========== */
+/* Shake animation when player gets hit - desktop version */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-10px, -10px);
+  }
+  20% {
+    transform: translate(10px, 10px);
+  }
+  30% {
+    transform: translate(-10px, 10px);
+  }
+  40% {
+    transform: translate(10px, -10px);
+  }
+  50% {
+    transform: translate(-10px, -10px);
+  }
+  60% {
+    transform: translate(10px, 10px);
+  }
+  70% {
+    transform: translate(-10px, 10px);
+  }
+  80% {
+    transform: translate(10px, -10px);
+  }
+  90% {
+    transform: translate(-10px, 0);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ========== MOBILE SHAKE EFFECT (REDUCED) ========== */
+/* Less intense shake for mobile devices to prevent off-screen */
+@media screen and (max-width: 768px) {
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    10% {
+      transform: translate(-3px, -3px);
+    }
+    20% {
+      transform: translate(3px, 3px);
+    }
+    30% {
+      transform: translate(-3px, 3px);
+    }
+    40% {
+      transform: translate(3px, -3px);
+    }
+    50% {
+      transform: translate(-3px, -3px);
+    }
+    60% {
+      transform: translate(3px, 3px);
+    }
+    70% {
+      transform: translate(-3px, 3px);
+    }
+    80% {
+      transform: translate(3px, -3px);
+    }
+    90% {
+      transform: translate(-3px, 0);
+    }
+  }
+
+  /* Additional adjustment for portrait mode (rotated view) */
+  @media (orientation: portrait) {
+    @keyframes shake {
+      0%,
+      100% {
+        transform: rotate(90deg) translateY(-100%) translate(0, 0);
+      }
+      10% {
+        transform: rotate(90deg) translateY(-100%) translate(-3px, -3px);
+      }
+      20% {
+        transform: rotate(90deg) translateY(-100%) translate(3px, 3px);
+      }
+      30% {
+        transform: rotate(90deg) translateY(-100%) translate(-3px, 3px);
+      }
+      40% {
+        transform: rotate(90deg) translateY(-100%) translate(3px, -3px);
+      }
+      50% {
+        transform: rotate(90deg) translateY(-100%) translate(-3px, -3px);
+      }
+      60% {
+        transform: rotate(90deg) translateY(-100%) translate(3px, 3px);
+      }
+      70% {
+        transform: rotate(90deg) translateY(-100%) translate(-3px, 3px);
+      }
+      80% {
+        transform: rotate(90deg) translateY(-100%) translate(3px, -3px);
+      }
+      90% {
+        transform: rotate(90deg) translateY(-100%) translate(-3px, 0);
+      }
+    }
+  }
+}
+
+/* ========== FIRE EFFECT ON PLAYER ========== */
+/* Container for fire animation */
+.fire {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Base flame element */
+.flame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 12px;
+  image-rendering: pixelated;
+}
+
+/* First flame - left side */
+.flame:nth-child(1) {
+  width: 12px;
+  height: 16px;
+  left: 40%;
+  background: #ff0000; /* Red base */
+  animation: flamePixels1 0.4s steps(4) infinite;
+}
+
+/* Second flame - center */
+.flame:nth-child(2) {
+  width: 8px;
+  height: 20px;
+  left: 50%;
+  background: #ff2200;
+  animation: flamePixels2 0.5s steps(4) infinite;
+}
+
+/* Third flame - right side */
+.flame:nth-child(3) {
+  width: 10px;
+  height: 14px;
+  left: 60%;
+  background: #ff1100;
+  animation: flamePixels3 0.45s steps(4) infinite;
+}
+
+/* ========== FLAME ANIMATIONS ========== */
+/* Individual pixels wave left and right */
+@keyframes flamePixels1 {
+  0% {
+    box-shadow: 2px -4px 0 0 #ff4500, -1px -8px 0 0 #ff6600,
+      3px -12px 0 0 #ff8800, -2px -16px 0 0 #ffaa00;
+  }
+  25% {
+    box-shadow: -2px -4px 0 0 #ff4500, 3px -8px 0 0 #ff6600,
+      1px -12px 0 0 #ff8800, -3px -16px 0 0 #ffaa00;
+  }
+  50% {
+    box-shadow: 3px -4px 0 0 #ff4500, -2px -8px 0 0 #ff6600,
+      -3px -12px 0 0 #ff8800, 2px -16px 0 0 #ffaa00;
+  }
+  75% {
+    box-shadow: -3px -4px 0 0 #ff4500, 2px -8px 0 0 #ff6600,
+      -1px -12px 0 0 #ff8800, 3px -16px 0 0 #ffaa00;
+  }
+  100% {
+    box-shadow: 2px -4px 0 0 #ff4500, -1px -8px 0 0 #ff6600,
+      3px -12px 0 0 #ff8800, -2px -16px 0 0 #ffaa00;
+  }
+}
+
+@keyframes flamePixels2 {
+  0% {
+    box-shadow: -2px -4px 0 0 #ff4400, 3px -8px 0 0 #ff6600,
+      -1px -12px 0 0 #ff8800, 2px -16px 0 0 #ffaa00, -3px -20px 0 0 #ffcc00;
+  }
+  25% {
+    box-shadow: 3px -4px 0 0 #ff4400, -3px -8px 0 0 #ff6600,
+      2px -12px 0 0 #ff8800, -2px -16px 0 0 #ffaa00, 3px -20px 0 0 #ffcc00;
+  }
+  50% {
+    box-shadow: -3px -4px 0 0 #ff4400, 2px -8px 0 0 #ff6600,
+      3px -12px 0 0 #ff8800, -3px -16px 0 0 #ffaa00, 1px -20px 0 0 #ffcc00;
+  }
+  75% {
+    box-shadow: 2px -4px 0 0 #ff4400, -2px -8px 0 0 #ff6600,
+      -3px -12px 0 0 #ff8800, 3px -16px 0 0 #ffaa00, -2px -20px 0 0 #ffcc00;
+  }
+  100% {
+    box-shadow: -2px -4px 0 0 #ff4400, 3px -8px 0 0 #ff6600,
+      -1px -12px 0 0 #ff8800, 2px -16px 0 0 #ffaa00, -3px -20px 0 0 #ffcc00;
+  }
+}
+
+@keyframes flamePixels3 {
+  0% {
+    box-shadow: 3px -4px 0 0 #ff4400, -2px -8px 0 0 #ff7700,
+      2px -12px 0 0 #ff9900, -3px -16px 0 0 #ffbb00;
+  }
+  25% {
+    box-shadow: -3px -4px 0 0 #ff4400, 3px -8px 0 0 #ff7700,
+      -2px -12px 0 0 #ff9900, 2px -16px 0 0 #ffbb00;
+  }
+  50% {
+    box-shadow: 2px -4px 0 0 #ff4400, -3px -8px 0 0 #ff7700,
+      3px -12px 0 0 #ff9900, -1px -16px 0 0 #ffbb00;
+  }
+  75% {
+    box-shadow: -2px -4px 0 0 #ff4400, 1px -8px 0 0 #ff7700,
+      -3px -12px 0 0 #ff9900, 3px -16px 0 0 #ffbb00;
+  }
+  100% {
+    box-shadow: 3px -4px 0 0 #ff4400, -2px -8px 0 0 #ff7700,
+      2px -12px 0 0 #ff9900, -3px -16px 0 0 #ffbb00;
+  }
+}
+
+/* ========== SMOKE PARTICLES ========== */
+.smoke {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #444444;
+  image-rendering: pixelated;
+  animation: pixel-smoke-rise 1.2s steps(6) infinite;
+}
+
+/* Different smoke particle variations */
+.smoke:nth-child(4) {
+  box-shadow: 4px 0 0 0 #555555, 0 4px 0 0 #333333;
+}
+
+.smoke:nth-child(5) {
+  box-shadow: -4px 0 0 0 #555555, 0 4px 0 0 #333333;
+}
+
+.smoke:nth-child(6) {
+  box-shadow: 2px 0 0 0 #555555, 0 -4px 0 0 #333333;
+}
+
+/* Smoke rises and fades */
+@keyframes pixel-smoke-rise {
+  0% {
+    transform: translateY(0) scale(1) translateX(0);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-10px) scale(1.2) translateX(-3px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.5) translateX(3px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-30px) scale(1.8) translateX(-2px);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-40px) scale(2) translateX(2px);
+    opacity: 0;
+  }
+}
+
+/* ========== UI ELEMENTS ========== */
+/* Score display - top left */
+#score {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #00ffff;
+  font-family: monospace;
+  font-size: 20px;
+  text-shadow: 0 0 10px #00ffff;
+  z-index: 15;
+}
+
+/* Game over message */
+#gameOver {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff0066;
+  font-family: monospace;
+  font-size: 24px;
+  display: none;
+  text-align: center;
+  text-shadow: 0 0 20px #ff0066;
+  line-height: 1.8;
+  z-index: 20;
+}
+
+/* Restart button */
+#restartButton {
+  background: #ff0066;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #ff0066;
+  transition: all 0.3s;
+  margin-top: 20px;
+}
+
+#restartButton:hover {
+  background: #cc0052;
+  transform: scale(1.1);
+  box-shadow: 0 0 30px #ff0066;
+}
+
+#restartButton:active {
+  transform: scale(0.95);
+}
+
+/* Pause menu overlay */
+#pauseMenu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #00ffff;
+  font-family: monospace;
+  font-size: 24px;
+  display: none;
+  text-align: center;
+  text-shadow: 0 0 20px #00ffff;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 10px;
+  line-height: 1.8;
+  z-index: 20;
+}
+
+/* Pause menu buttons */
+.pause-btn {
+  background: #00ffff;
+  color: #0a0a1a;
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #00ffff;
+  transition: all 0.3s;
+  margin: 10px 5px;
+}
+
+.pause-btn:hover {
+  background: #00cccc;
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00ffff;
+}
+
+.pause-btn:active {
+  transform: scale(0.95);
+}
+
+/* Pause button - top right */
+#pauseBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #00ffff;
+  font-family: monospace;
+  font-size: 18px;
+  cursor: pointer;
+  text-shadow: 0 0 10px #00ffff;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+/* ========== START SCREEN ========== */
+#startScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 26, 0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 30;
+}
+
+/* Game title */
+#gameTitle {
+  color: #00ffff;
+  font-family: monospace;
+  font-size: 48px;
+  text-shadow: 0 0 20px #00ffff;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+/* Pulsing animation for title */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Instructions text */
+#instructions {
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 30px;
+  line-height: 1.8;
+}
+
+/* Difficulty selection container */
+#difficultySelection {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Difficulty buttons */
+.difficulty-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 18px;
+  padding: 12px 25px;
+  border: 2px solid #666;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.difficulty-btn:hover {
+  border-color: #00ffff;
+  color: #00ffff;
+  transform: scale(1.05);
+}
+
+/* Selected difficulty highlight */
+.difficulty-btn.selected {
+  background: #00ffff;
+  color: #0a0a1a;
+  border-color: #00ffff;
+  box-shadow: 0 0 15px #00ffff;
+}
+
+/* Play button */
+#playButton {
+  background: #00ffff;
+  color: #0a0a1a;
+  font-family: monospace;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px 40px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #00ffff;
+  transition: all 0.3s;
+}
+
+#playButton:hover {
+  background: #00cccc;
+  transform: scale(1.1);
+  box-shadow: 0 0 30px #00ffff;
+}
+
+#playButton:active {
+  transform: scale(0.95);
+}
+
+/* Scores button */
+#scoresButton {
+  background: #ff0066;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 12px 35px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #ff0066;
+  transition: all 0.3s;
+  margin-top: 15px;
+}
+
+#scoresButton:hover {
+  background: #cc0052;
+  transform: scale(1.1);
+  box-shadow: 0 0 30px #ff0066;
+}
+
+#scoresButton:active {
+  transform: scale(0.95);
+}
+
+#devInfo {
+  color: #00ffff;
+  font-family: monospace;
+  font-size: 12px;
+  text-shadow: 0 0 20px #00ffff;
+  /* margin-bottom: 20px; */
+  animation: pulse 2s infinite;
+  position: absolute;
+  bottom: 25px;
+}
+
+/* High scores window */
+#highScoresWindow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 26, 0.95);
+  border: 3px solid #ff0066;
+  border-radius: 15px;
+  padding: 30px;
+  display: none;
+  z-index: 35;
+  box-shadow: 0 0 30px #ff0066;
+  min-width: 300px;
+}
+
+#highScoresWindow h2 {
+  color: #ff0066;
+  font-family: monospace;
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px #ff0066;
+}
+
+.score-entry {
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 18px;
+  padding: 10px;
+  margin: 8px 0;
+  background: rgba(255, 0, 102, 0.2);
+  border-left: 4px solid #ff0066;
+  border-radius: 5px;
+}
+
+.score-rank {
+  color: #ff0066;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+#closeScoresBtn {
+  background: #ff0066;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ff0066;
+  transition: all 0.3s;
+  margin-top: 20px;
+  width: 100%;
+}
+
+#closeScoresBtn:hover {
+  background: #cc0052;
+  transform: scale(1.05);
+}
+
+#closeScoresBtn:active {
+  transform: scale(0.95);
+}
+
+/* High score display during gameplay */
+#highScoreDisplay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #ff0066;
+  font-family: monospace;
+  font-size: 16px;
+  text-shadow: 0 0 10px #ff0066;
+  z-index: 15;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.high-score-label {
+  font-size: 12px;
+  color: #ff66aa;
+}
+
+/* Achievement popup */
+#achievementPopup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 26, 0.95);
+  border: 4px solid #ff0066;
+  border-radius: 20px;
+  padding: 30px 50px;
+  z-index: 100;
+  box-shadow: 0 0 40px #ff0066, 0 0 80px rgba(255, 0, 102, 0.5);
+  display: none;
+  text-align: center;
+  opacity: 0;
+}
+
+#achievementPopup.show {
+  display: block;
+  animation: popupFade 2.5s ease-in-out forwards;
+}
+
+@keyframes popupFade {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#achievementPopup h3 {
+  color: #ff0066;
+  font-family: monospace;
+  font-size: 32px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px #ff0066, 0 0 40px rgba(255, 0, 102, 0.8);
+  animation: textGlow 0.5s infinite alternate;
+}
+
+#achievementPopup p {
+  color: #ff66aa;
+  font-family: monospace;
+  font-size: 20px;
+  text-shadow: 0 0 10px #ff66aa;
+}
+
+@keyframes textGlow {
+  from {
+    text-shadow: 0 0 20px #ff0066, 0 0 40px rgba(255, 0, 102, 0.8);
+  }
+  to {
+    text-shadow: 0 0 30px #ff0066, 0 0 60px #ff0066,
+      0 0 80px rgba(255, 0, 102, 0.5);
+  }
+}
+
+/* Player name input popup */
+#playerNamePopup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 10, 26, 0.95);
+  border: 3px solid #ff0066;
+  border-radius: 15px;
+  padding: 30px;
+  display: none;
+  z-index: 35;
+  box-shadow: 0 0 30px #ff0066;
+  min-width: 320px;
+  text-align: center;
+}
+
+#playerNamePopup h2 {
+  color: #ff0066;
+  font-family: monospace;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px #ff0066;
+}
+
+#playerNameInput {
+  width: 100%;
+  background: rgba(255, 0, 102, 0.2);
+  border: 2px solid #ff0066;
+  border-radius: 8px;
+  padding: 12px;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+#nameError {
+  color: #ff3388;
+  font-family: monospace;
+  font-size: 14px;
+  margin-bottom: 15px;
+  min-height: 20px;
+}
+
+#playerNameInput::placeholder {
+  color: #ff66aa;
+}
+
+#playerNameInput:focus {
+  border-color: #ff3388;
+  box-shadow: 0 0 15px rgba(255, 0, 102, 0.5);
+}
+
+#startGameBtn {
+  background: #ff0066;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ff0066;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+#startGameBtn:hover {
+  background: #cc0052;
+  transform: scale(1.05);
+}
+
+#startGameBtn:active {
+  transform: scale(0.95);
+}
+
+/* ========== MOBILE CONTROLS ========== */
+/* Container for all mobile controls - hidden by default */
+#mobileControls {
+  display: none; /* Hidden initially, shown when game starts */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks through container */
+  z-index: 50;
+}
+
+/* ========== DIRECTIONAL ARROWS ========== */
+/* Container for arrow buttons - bottom left */
+#arrowControls {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  width: 180px;
+  height: 180px;
+  pointer-events: all;
+}
+
+/* Individual arrow buttons */
+.arrow-btn {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 255, 255, 0.7);
+  border: 3px solid #00ffff;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  user-select: none;
+  transition: all 0.1s;
+}
+
+.arrow-btn:active {
+  background: rgba(0, 255, 255, 0.9);
+  transform: scale(0.9);
+  box-shadow: 0 0 25px #00ffff;
+}
+
+/* Position each arrow */
+#arrowUp {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#arrowDown {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#arrowLeft {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#arrowRight {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ========== SHOOT BUTTON ========== */
+/* Shoot button - bottom right */
+#shootButton {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(255, 0, 102, 0.7);
+  border: 4px solid #ff0066;
+  box-shadow: 0 0 20px #ff0066;
+  pointer-events: all; /* Enable touch on button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  text-shadow: 0 0 10px white;
+  user-select: none;
+  transition: all 0.1s;
+}
+
+/* Shoot button when pressed */
+#shootButton:active {
+  transform: scale(0.9);
+  background: rgba(255, 0, 102, 0.9);
+  box-shadow: 0 0 30px #ff0066;
+}
+
+/* ========== FORCE LANDSCAPE MODE ========== */
+/* Force game to always display in landscape orientation */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  /* Rotate the entire game container 90 degrees */
+  #game {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vh; /* Use viewport height as width */
+    height: 100vw; /* Use viewport width as height */
+    transform-origin: top left;
+    transform: rotate(90deg) translateY(-100%);
+  }
+
+  /* Adjust body for rotated content */
+  body {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+}
+
+/* ========== RESPONSIVE DESIGN FOR MOBILE ========== */
+@media screen and (max-width: 768px) {
+  /* Reduce title size on mobile */
+  #gameTitle {
+    font-size: 36px;
+  }
+
+  /* Adjust instructions text */
+  #instructions {
+    font-size: 14px;
+    padding: 0 20px;
+  }
+
+  /* Make difficulty buttons stack or smaller */
+  #difficultySelection {
+    gap: 10px;
+    flex-wrap: wrap; /* Allow wrapping on very small screens */
+    justify-content: center;
+  }
+
+  .difficulty-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+
+  /* Adjust play button */
+  #playButton {
+    font-size: 20px;
+    padding: 12px 35px;
+  }
+
+  /* Adjust scores button */
+  #scoresButton {
+    font-size: 18px;
+    padding: 10px 30px;
+  }
+
+  /* Smaller score display */
+  #score {
+    font-size: 16px;
+    top: 10px;
+    left: 10px;
+  }
+
+  /* High score display */
+  #highScoreDisplay {
+    font-size: 14px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .high-score-label {
+    font-size: 10px;
+  }
+
+  /* Smaller pause button */
+  #pauseBtn {
+    font-size: 16px;
+    padding: 8px 12px;
+    top: 10px;
+    right: 10px;
+  }
+
+  /* Adjust game over text */
+  #gameOver {
+    font-size: 20px;
+    max-width: 90%;
+  }
+
+  /* Smaller restart button */
+  #restartButton {
+    font-size: 18px;
+    padding: 10px 25px;
+  }
+
+  /* Adjust pause menu */
+  #pauseMenu {
+    font-size: 20px;
+    padding: 25px;
+    max-width: 80%;
+  }
+
+  .pause-btn {
+    font-size: 16px;
+    padding: 8px 20px;
+  }
+
+  /* High scores window */
+  #highScoresWindow {
+    padding: 25px;
+    min-width: 250px;
+    max-width: 80%;
+  }
+
+  #highScoresWindow h2 {
+    font-size: 24px;
+  }
+
+  .score-entry {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  /* Player name popup */
+  #playerNamePopup {
+    padding: 25px;
+    min-width: 280px;
+    max-width: 80%;
+  }
+
+  #playerNamePopup h2 {
+    font-size: 20px;
+  }
+
+  #playerNameInput {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  #startGameBtn {
+    font-size: 16px;
+    padding: 10px 25px;
+  }
+
+  #nameError {
+    font-size: 12px;
+  }
+
+  /* Smaller mobile controls for very small screens */
+  #arrowControls {
+    width: 190px;
+    height: 190px;
+    bottom: 20px;
+    left: 20px;
+  }
+
+  .arrow-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+
+  #shootButton {
+    width: 145px;
+    height: 145px;
+    bottom: 20px;
+    right: 20px;
+    font-size: 42px;
+  }
+}
+
+/* ========== EXTRA SMALL SCREENS ========== */
+@media screen and (max-width: 480px) {
+  #gameTitle {
+    font-size: 28px;
+  }
+
+  #instructions {
+    font-size: 12px;
+  }
+
+  .difficulty-btn {
+    font-size: 14px;
+    padding: 8px 15px;
+  }
+
+  #playButton {
+    font-size: 18px;
+    padding: 10px 30px;
+  }
+
+  #scoresButton {
+    font-size: 16px;
+    padding: 8px 25px;
+  }
+
+  .pause-btn {
+    font-size: 14px;
+    padding: 7px 18px;
+  }
+
+  /* High scores window */
+  #highScoresWindow {
+    padding: 20px;
+    min-width: 200px;
+    max-width: 85%;
+  }
+
+  #highScoresWindow h2 {
+    font-size: 20px;
+  }
+
+  .score-entry {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  #closeScoresBtn {
+    font-size: 14px;
+    padding: 8px 20px;
+  }
+
+  /* Achievement popup mobile adjustments */
+  #achievementPopup {
+    padding: 25px 40px;
+  }
+
+  #achievementPopup h3 {
+    font-size: 28px;
+  }
+
+  #achievementPopup p {
+    font-size: 18px;
+  }
+
+  /* Very small mobile controls */
+  #arrowControls {
+    width: 175px;
+    height: 175px;
+    bottom: 15px;
+    left: 15px;
+  }
+
+  .arrow-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  #shootButton {
+    width: 125px;
+    height: 125px;
+    bottom: 15px;
+    right: 15px;
+    font-size: 36px;
+  }
+
+  /* Achievement popup extra small */
+  #achievementPopup {
+    padding: 20px 30px;
+  }
+
+  #achievementPopup h3 {
+    font-size: 24px;
+  }
+
+  #achievementPopup p {
+    font-size: 16px;
+  }
+
+  /* Player name popup */
+  #playerNamePopup {
+    padding: 20px;
+    min-width: 240px;
+    max-width: 85%;
+  }
+
+  #playerNamePopup h2 {
+    font-size: 18px;
+  }
+
+  #playerNameInput {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #startGameBtn {
+    font-size: 14px;
+    padding: 8px 20px;
+  }
+
+  #nameError {
+    font-size: 11px;
+  }
+}
