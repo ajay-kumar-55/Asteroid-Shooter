@@ -544,7 +544,7 @@ function restartGame() {
   scoreEl.textContent = "Score: 0";
   gameOverEl.style.display = "none";
   startScreen.style.display = "flex";
-  pauseBtnEl.textContent = "⏸ PAUSE";
+  pauseBtnEl.textContent = "PAUSE";
 }
 
 restartButton.addEventListener("click", restartGame);
@@ -798,3 +798,4 @@ window.addEventListener("resize", () => {
   playerY = Math.max(30, Math.min(gameHeight - 30, playerY));
   updatePlayerPosition();
 });
+
