@@ -880,7 +880,7 @@ body {
 /* High score display during gameplay */
 #highScoreDisplay {
   position: absolute;
-  top: 20px;
+  top: 130px;
   right: 20px;
   color: #ff0066;
   font-family: monospace;
@@ -1439,3 +1439,4 @@ body {
     font-size: 11px;
   }
 }
+
