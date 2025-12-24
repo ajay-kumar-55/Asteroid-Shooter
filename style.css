@@ -1211,7 +1211,7 @@ body {
   /* High score display */
   #highScoreDisplay {
     font-size: 14px;
-    top: 10px;
+    top: 90px;
     right: 10px;
   }
 
@@ -1439,4 +1439,5 @@ body {
     font-size: 11px;
   }
 }
+
 
