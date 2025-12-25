@@ -175,7 +175,7 @@ body {
 
 .obstacle {
   position: absolute;
-  background: #808080; /* Brown color */
+  background: #808080; /*  */
   border-radius: 40% 50% 45% 55%; /* Irregular shape */
   /* box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.5),
     inset 5px 5px 10px rgba(0, 0, 0, 0.5); */
@@ -208,11 +208,11 @@ body {
   position: absolute;
   width: 8px;
   height: 16px;
-  background: #ff0066; /* Pink base */
-  /* image-rendering: pixelated; */
-  box-shadow: 0 -4px 0 0 #ff3388, /* Lighter pink blocks */ 0 -8px 0 0 #ff66aa,
+  background: #ff0066; /* \ */
+  /* */
+  box-shadow: 0 -4px 0 0 #ff3388, 0 -8px 0 0 #ff66aa,
     0 -12px 0 0 #ff99cc, 0 0 8px #ff0066,
-    /* Glow effect */ 0 0 16px rgba(255, 0, 102, 0.8);
+     0 0 16px rgba(255, 0, 102, 0.8);
   z-index: 3;
 }
 
@@ -1390,6 +1390,7 @@ body {
     font-size: 11px;
   }
 }
+
 
 
 
